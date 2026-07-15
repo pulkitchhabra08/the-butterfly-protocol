@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Butterfly Protocol 🦋</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #020205;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Cosmic Grid and Matrix Lighting */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .blur-blob-pink {
+            position: absolute;
+            top: -10%; left: 20%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(255, 0, 92, 0.07) 0%, transparent 70%);
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .blur-blob-cyan {
+            position: absolute;
+            bottom: -10%; right: 10%; width: 45vw; height: 45vw;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, transparent 70%);
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Navigation Header */
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: linear-gradient(90deg, #ff005c, #7f00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .terminal-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: #00f2fe;
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 900px;
+            margin: 120px auto 80px auto;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .protocol-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.15);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #00f2fe;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        .protocol-status ::before {
+            content: '';
+            display: inline-block;
+            width: 6px; height: 6px;
+            background: #00f2fe;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f2fe;
+        }
+
+        .hero h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -4px;
+            color: #ffffff;
+            margin-bottom: 30px;
+        }
+
+        .hero h2 span {
+            background: linear-gradient(135deg, #ff005c 20%, #7f00ff 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.25rem;
+            color: #8b949e;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* The System Controller Workspace */
+        .workspace-anchor {
+            max-width: 1000px;
+            margin: 0 auto 150px auto;
+            position: relative;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .app-container {
+            background: rgba(8, 8, 12, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            box-shadow: 0 50px 150px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 45px;
+        }
+
+        .app-inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+        }
+
+        .input-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 16px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-card:focus-within {
+            border-color: rgba(255, 0, 92, 0.4);
+            background: rgba(255, 0, 92, 0.01);
+            box-shadow: 0 0 30px rgba(255, 0, 92, 0.08);
+        }
+
+        .input-card.target:focus-within {
+            border-color: rgba(0, 242, 254, 0.4);
+            background: rgba(0, 242, 254, 0.01);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.08);
+        }
+
+        .input-lbl {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #ff005c;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-card.target .input-lbl {
+            color: #00f2fe;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button {
+            padding: 24px 45px;
+            background: #ffffff;
+            color: #020205;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #ff005c, #7f00ff);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(255, 0, 92, 0.25);
+        }
+
+        button:disabled {
+            background: #12121a;
+            color: #4b5563;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Dossier Output Presentation */
+        .output-zone {
+            min-height: 200px;
+        }
+
+        #default-view {
+            text-align: center;
+            max-width: 550px;
+            margin: 40px auto;
+            color: #4b5563;
+        }
+
+        .story-container {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .story-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #00f2fe;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .story-header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 35px;
+            letter-spacing: -1px;
+            line-height: 1.15;
+        }
+
+        .story-body-text {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: #d1d5db;
+        }
+
+        .story-body-text p {
+            margin-bottom: 30px;
+        }
+
+        /* Dossier Elements injected by AI */
+        .highlight-text {
+            background: linear-gradient(90deg, #ff005c, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        #status-panel {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 25px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media(max-width: 900px) {
+            .app-inputs-grid { grid-template-columns: 1fr; }
+            .hero h2 { font-size: 3.5rem; letter-spacing: -2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-overlay"></div>
+    <div class="blur-blob-pink"></div>
+    <div class="blur-blob-cyan"></div>
+
+<nav>
+        <div class="logo">The <span>Butterfly</span> Protocol</div>
+        <div class="nav-links">
+            <a href="#engine" class="nav-item" style="font-size: 0.9rem; color: #8b949e; text-decoration: none; font-weight: 500; margin-right: 25px; transition: color 0.3s ease;">Core Engine</a>
+            <a href="https://github.com" target="_blank" class="nav-item" style="font-size: 0.9rem; color: #8b949e; text-decoration: none; font-weight: 500; transition: color 0.3s ease;">Documentation</a>
+        </div>
+        
+</nav>
+
+    <section class="hero">
+        <div class="protocol-status">Timeline Diagnostic Online</div>
+        <h2>Trace the <span>Chaotic Ripples</span> of Time.</h2>
+        <p class="hero-desc">Every historical event leaves a wake. Input any two completely isolated cultural artifacts or events, and initiate the diagnostic execution sequence.</p>
+    </section>
+
+    <section class="workspace-anchor">
+        <div class="app-container">
+            <div class="app-inputs-grid">
+                <div class="input-card">
+                    <div class="input-lbl">Causal Flap (Topic A)</div>
+                    <input type="text" id="startInput" value="Cheesecake">
+                </div>
+                <div class="input-card target">
+                    <div class="input-lbl">Tornado Nexus (Topic B)</div>
+                    <input type="text" id="endInput" value="Roman Empire">
+                </div>
+                <button id="searchBtn" onclick="generateUnhingedLore()">Initiate Sequence</button>
+            </div>
+
+            <div class="output-zone">
+                <div id="default-view">
+                    <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.6;">[SYSTEM READY]<br>Input system nodes above to generate cross-temporal connection profiles.</p>
+                </div>
+
+                <div class="story-container" id="storyCard">
+                    <div class="story-meta" id="storyLabel">DIAGNOSTIC COMPLETE // TARGETS MATCHED</div>
+                    <h3 class="story-header-title" id="storyTitle">Anomalous Connection Manifested</h3>
+                    <div class="story-body-text" id="storyContent"></div>
+                </div>
+            </div>
+            
+            <div id="status-panel">CONSOLE_FEED: AWAITING PROTOCOL TRIGGER...</div>
+        </div>
+    </section>
+
+    <script>
+        async function generateUnhingedLore() {
+            const a = document.getElementById('startInput').value.trim();
+            const b = document.getElementById('endInput').value.trim();
+            const statusPanel = document.getElementById('status-panel');
+            const defaultView = document.getElementById('default-view');
+            const card = document.getElementById('storyCard');
+            const button = document.getElementById('searchBtn');
+            
+            if (!a || !b) {
+                statusPanel.innerText = "CONSOLE_ERR: INTERNALS INCOMPLETE.";
+                return;
+            }
+
+            button.disabled = true;
+            defaultView.style.display = "none";
+            card.style.display = "none";
+            statusPanel.innerText = "CRUNCHING REALITY LINES... SIMULATING MICRO-FLAPS...";
+
+            try {
+                const response = await fetch('/api/cook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topicA: a, topicB: b })
+                });
+
+                const data = await response.json();
+                
+                if (data.story) {
+                    document.getElementById('storyLabel').innerText = `PROMPTS DETECTED: [${a.toUpperCase()}] ➔ [${b.toUpperCase()}]`;
+                    document.getElementById('storyTitle').innerText = `${a} & ${b}: The Temporal Pipeline`;
+                    
+                    let formattedStory = data.story;
+                    formattedStory = formattedStory.replace(new RegExp(a, 'gi'), `<span class="highlight-text">${a}</span>`);
+                    formattedStory = formattedStory.replace(new RegExp(b, 'gi'), `<span class="highlight-text">${b}</span>`);
+                    
+                    document.getElementById('storyContent').innerHTML = formattedStory;
+                    card.style.display = "block";
+                    statusPanel.innerText = "LOGS GENERATED. PROTOCOL SHUTTING DOWN CLEANLY. 💅";
+                } else {
+                    statusPanel.innerText = "FATAL ERROR: AI LOGIC PIPELINE CAUGHT FIRE.";
+                }
+            } catch (err) {
+                statusPanel.innerText = "HARDWARE FAILURE: REALITY UNSTABLE.";
+            }
+            button.disabled = false;
+        }
+    </script>
+</body>
+</html>
